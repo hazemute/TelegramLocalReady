@@ -1,0 +1,21 @@
+Validation performed before packaging:
+
+PASS - Uploaded project was used directly; no separate replacement project.
+PASS - Docker Compose YAML parses successfully.
+PASS - 12 Compose services are present.
+PASS - All active Compose environment references resolve from .env/defaults.
+PASS - Gateway exposes MTProto ports 20443, 20543, 20643, 20644, 30443, 30444.
+PASS - Server Docker image version pinned to 0.40.224.502 (API layer 224 release).
+PASS - Android client advertises API layer 224.
+PASS - Client RSA public key/fingerprint matches bundled MyTelegram AuthServer private key.
+PASS - Client bootstrap DC list no longer contains Telegram public DC IPs.
+PASS - Public Telegram DNS DC fallback disabled in the Android client.
+PASS - gradlew.bat restored for Windows builds.
+PASS - Local MongoDB/Redis/RabbitMQ/MinIO override is valid YAML.
+
+Not executable in this environment:
+- Docker Desktop / Docker Engine runtime test (Docker daemon is not available here).
+- Android APK build (Android SDK/NDK are not installed here).
+- End-to-end MTProto login from a physical Android device.
+
+Use DOCTOR.cmd on Windows after START_SERVER.cmd for the runtime checks.

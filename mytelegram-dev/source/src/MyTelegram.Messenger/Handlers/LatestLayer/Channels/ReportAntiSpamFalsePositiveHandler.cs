@@ -1,0 +1,18 @@
+namespace MyTelegram.Messenger.Handlers.LatestLayer.Channels;
+/// <summary>
+/// Report a <a href="https://corefork.telegram.org/api/antispam">native antispam</a> false positive
+/// Possible errors
+/// Code Type Description
+/// 400 CHANNEL_INVALID The provided channel is invalid.
+/// <para><c>See <a href="https://corefork.telegram.org/method/channels.reportAntiSpamFalsePositive"/> </c></para>
+/// </summary>
+/// <remarks>
+/// Access: [User ✔] [Bot ✖] [Anonymous ✖]
+/// </remarks>
+internal sealed class ReportAntiSpamFalsePositiveHandler : RpcResultObjectHandler<MyTelegram.Schema.Channels.RequestReportAntiSpamFalsePositive, IBool>
+{
+    protected override Task<IBool> HandleCoreAsync(IRequestInput input, MyTelegram.Schema.Channels.RequestReportAntiSpamFalsePositive obj)
+    {
+        return Task.FromResult<IBool>(new TBoolTrue());
+    }
+}

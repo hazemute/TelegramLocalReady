@@ -1,0 +1,22 @@
+using IBool = MyTelegram.Schema.IBool;
+
+namespace MyTelegram.Messenger.Handlers.LatestLayer.Messages;
+/// <summary>
+/// Report a new incoming chat for spam, if the <a href="https://corefork.telegram.org/constructor/peerSettings">peer settings</a> of the chat allow us to do that
+/// Possible errors
+/// Code Type Description
+/// 400 CHANNEL_PRIVATE You haven't joined this channel/supergroup.
+/// 400 MSG_ID_INVALID Invalid message ID provided.
+/// 400 PEER_ID_INVALID The provided peer id is invalid.
+/// <para><c>See <a href="https://corefork.telegram.org/method/messages.reportSpam"/> </c></para>
+/// </summary>
+/// <remarks>
+/// Access: [User ✔] [Bot ✖] [Anonymous ✖]
+/// </remarks>
+internal sealed class ReportSpamHandler : RpcResultObjectHandler<MyTelegram.Schema.Messages.RequestReportSpam, IBool>
+{
+    protected override Task<IBool> HandleCoreAsync(IRequestInput input, MyTelegram.Schema.Messages.RequestReportSpam obj)
+    {
+        return Task.FromResult<IBool>(new TBoolTrue());
+    }
+}

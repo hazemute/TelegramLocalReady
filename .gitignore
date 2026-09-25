@@ -1,0 +1,53 @@
+.idea/
+.gradle/
+build/
+obj/
+*.iml
+local.properties
+*.keystore
+*.jks
+*.p12
+TMessagesProj/.cxx/
+TMessagesProj/jniLibs/
+TMessagesProj/jniRes/
+**/.DS_Store
+TMessagesProj/afat/
+TMessagesProj_App/afat/
+TMessagesProj_AppHockeyApp/afat/
+TMessagesProj_AppStandalone/afat/
+TMessagesProj_AppHuawei/afat/
+TMessagesProj/jni/ffmpeg/build_android
+
+# Local self-hosted MyTelegram runtime
+.mytelegram-local.json
+dist/
+mytelegram-dev/docker/compose/data/
+# Local credentials and runtime configuration
+.env
+.env.*
+!.env.example
+*.local
+local.properties
+
+# Build and generated output
+.gradle/
+**/build/
+**/out/
+*.apk
+*.aab
+*.apks
+*.log
+
+# Local server data and Docker volumes
+mytelegram-dev/docker/compose/data/
+mytelegram-dev/docker/compose/volumes/
+mytelegram-dev/docker/compose/*/data/
+mytelegram-dev/docker/compose/*/logs/
+**/docker-data/
+
+# IDE and OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
