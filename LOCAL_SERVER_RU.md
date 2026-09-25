@@ -15,8 +15,9 @@
 Нужно:
 
 1. Docker Desktop с WSL2 backend.
-2. Android Studio 2025.1.4.
-3. Через SDK Manager:
+2. Git for Windows (нужен для первой локальной сборки MinIO).
+3. Android Studio 2025.1.4.
+4. Через SDK Manager:
    - Android SDK 36;
    - Build Tools 36.0.0;
    - Android NDK `27.2.12479018`;
@@ -40,6 +41,7 @@ START_SERVER.cmd
 - один раз заменит дефолтные пароли/ключи локальными случайными значениями;
 - при первом запуске создаст локальный `.env` из безопасного шаблона `.env.example`;
 - скачает pinned Docker images;
+- при первом запуске соберёт MinIO из закреплённого официального исходного релиза; для этого нужен Git for Windows, сборка может занять время;
 - поднимет MongoDB, Redis, RabbitMQ, MinIO и MyTelegram;
 - откроет входящие MTProto TCP-порты в Windows Firewall.
 

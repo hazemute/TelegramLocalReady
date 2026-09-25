@@ -8,6 +8,11 @@ $Root = Split-Path -Parent $PSScriptRoot
 $ComposeDir = Join-Path $Root 'mytelegram-dev\docker\compose'
 $ComposeFile = Join-Path $ComposeDir 'docker-compose.yml'
 $LocalComposeFile = Join-Path $ComposeDir 'docker-compose.local.yml'
+$MinioTag = 'RELEASE.2025-10-15T17-29-55Z'
+$MinioCommit = '9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a'
+$MinioImage = "telegramlocal/minio:$MinioTag"
+$MinioSource = Join-Path $ComposeDir 'data\minio-source'
+$MinioDockerfile = Join-Path $PSScriptRoot 'minio.Dockerfile'
 
 & (Join-Path $PSScriptRoot 'configure-local.ps1') -ServerIp $ServerIp
 
@@ -17,14 +22,40 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
 try { docker info *> $null } catch { throw 'Docker Desktop is installed but Docker Engine is not running.' }
 if ($LASTEXITCODE -ne 0) { throw 'Docker Desktop is installed but Docker Engine is not running.' }
 
+docker image inspect $MinioImage *> $null
+if ($LASTEXITCODE -ne 0) {
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        throw 'Git is required for the first MinIO build. Install Git for Windows and rerun START_SERVER.cmd.'
+    }
+    if (-not (Test-Path $MinioSource)) {
+        New-Item -ItemType Directory -Path (Split-Path -Parent $MinioSource) -Force | Out-Null
+        Write-Host 'Downloading pinned MinIO source from GitHub...' -ForegroundColor Cyan
+        git clone --depth 1 --branch $MinioTag https://github.com/minio/minio.git $MinioSource
+        if ($LASTEXITCODE -ne 0) { throw 'MinIO source download failed.' }
+    }
+    if (-not (Test-Path (Join-Path $MinioSource '.git'))) {
+        throw "Incomplete MinIO source at $MinioSource. Remove only that folder and rerun START_SERVER.cmd."
+    }
+    $sourceCommit = (git -C $MinioSource rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne $MinioCommit) {
+        throw "MinIO source commit did not match pinned release. Found: $sourceCommit"
+    }
+    Write-Host 'Building MinIO locally from its verified upstream source (first run only)...' -ForegroundColor Cyan
+    docker build -f $MinioDockerfile -t $MinioImage $MinioSource
+    if ($LASTEXITCODE -ne 0) { throw 'Local MinIO image build failed.' }
+}
+
 Push-Location $ComposeDir
 try {
     Write-Host 'Pulling pinned server/database images...' -ForegroundColor Cyan
-    docker compose -p mytelegram-local -f $ComposeFile -f $LocalComposeFile pull
+    $services = @(docker compose -p mytelegram-local -f $ComposeFile -f $LocalComposeFile config --services |
+        Where-Object { $_ -and $_.Trim() -ne 'minio' })
+    if ($LASTEXITCODE -ne 0 -or $services.Count -eq 0) { throw 'docker compose config failed.' }
+    docker compose -p mytelegram-local -f $ComposeFile -f $LocalComposeFile pull $services
     if ($LASTEXITCODE -ne 0) { throw 'docker compose pull failed.' }
 
     Write-Host 'Starting MongoDB, Redis, RabbitMQ, MinIO and MyTelegram...' -ForegroundColor Cyan
-    docker compose -p mytelegram-local -f $ComposeFile -f $LocalComposeFile up -d --remove-orphans
+    docker compose -p mytelegram-local -f $ComposeFile -f $LocalComposeFile up -d --pull never --remove-orphans
     if ($LASTEXITCODE -ne 0) { throw 'docker compose up failed.' }
 
     # Open only MTProto gateway ports to other machines. DB/admin ports stay bound to localhost.
