@@ -8,6 +8,14 @@ $Root = Split-Path -Parent $PSScriptRoot
 $EnvFile = Join-Path $Root 'mytelegram-dev\docker\compose\.env'
 $HeaderFile = Join-Path $Root 'TMessagesProj\jni\tgnet\LocalServerConfig.h'
 $StateFile = Join-Path $Root '.mytelegram-local.json'
+$EnvTemplate = Join-Path $Root 'mytelegram-dev\docker\compose\.env.example'
+
+if (-not (Test-Path $EnvFile)) {
+    if (-not (Test-Path $EnvTemplate)) {
+        throw 'Missing .env.example. Restore the complete project before starting.'
+    }
+    Copy-Item $EnvTemplate $EnvFile
+}
 
 function Get-DefaultIPv4 {
     $configs = Get-NetIPConfiguration -ErrorAction SilentlyContinue | Where-Object {
@@ -80,20 +88,23 @@ function New-Base64Secret([int]$Bytes = 32) {
     return [Convert]::ToBase64String($buf)
 }
 
-if ($env -match '(?m)^RabbitMQ__Connections__Default__Password=avcdu0Vzp9DyRl8G$') {
+if ($env -match '(?m)^RabbitMQ__Connections__Default__Password=GENERATE_ON_FIRST_RUN$') {
     $env = [regex]::Replace($env, '(?m)^RabbitMQ__Connections__Default__Password=.*$', 'RabbitMQ__Connections__Default__Password=' + (New-HexSecret 24))
 }
-if ($env -match '(?m)^Minio__SecretKey=yw2lCksTPiAS0Bgj$') {
+if ($env -match '(?m)^Minio__SecretKey=GENERATE_ON_FIRST_RUN$') {
     $env = [regex]::Replace($env, '(?m)^Minio__SecretKey=.*$', 'Minio__SecretKey=' + (New-HexSecret 24))
 }
-if ($env -match '(?m)^App__AccessHashSecretKey=Pki5MXv4bzuVU2cqLZ7nTs0KFmGJwa1RAt3IYho8xrEHeC6S$') {
+if ($env -match '(?m)^App__AccessHashSecretKey=GENERATE_ON_FIRST_RUN$') {
     $env = [regex]::Replace($env, '(?m)^App__AccessHashSecretKey=.*$', 'App__AccessHashSecretKey=' + (New-HexSecret 32))
 }
-if ($env -match '(?m)^App__EncryptionConfig__MessageKeys__0__Key=Avep77d7RWzZDmmUbUugxLnhpe/hu9LTp5AbR/0mxJ8=$') {
+if ($env -match '(?m)^App__EncryptionConfig__MessageKeys__0__Key=GENERATE_ON_FIRST_RUN$') {
     $env = [regex]::Replace($env, '(?m)^App__EncryptionConfig__MessageKeys__0__Key=.*$', 'App__EncryptionConfig__MessageKeys__0__Key=' + (New-Base64Secret 32))
 }
-if ($env -match '(?m)^App__EncryptionConfig__IndexKeys__0__Key=GER1ceumzInUmQPMD8h95Q50KsdGs19SN0wdfhetFek=$') {
+if ($env -match '(?m)^App__EncryptionConfig__IndexKeys__0__Key=GENERATE_ON_FIRST_RUN$') {
     $env = [regex]::Replace($env, '(?m)^App__EncryptionConfig__IndexKeys__0__Key=.*$', 'App__EncryptionConfig__IndexKeys__0__Key=' + (New-Base64Secret 32))
+}
+if ($env -match '(?m)^RabbitMQ__ErlangCookie=GENERATE_ON_FIRST_RUN$') {
+    $env = [regex]::Replace($env, '(?m)^RabbitMQ__ErlangCookie=.*$', 'RabbitMQ__ErlangCookie=' + (New-HexSecret 24))
 }
 
 [System.IO.File]::WriteAllText($EnvFile, $env, $Utf8NoBom)

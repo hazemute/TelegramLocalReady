@@ -10,6 +10,9 @@ services:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
   minio:
+    image: quay.io/minio/minio:RELEASE.2025-09-06T17-38-46Z
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
     ports:
       - "127.0.0.1:9000:9000"
       - "127.0.0.1:9001:9001"

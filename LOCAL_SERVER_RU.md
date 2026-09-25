@@ -38,6 +38,7 @@ START_SERVER.cmd
 - пропишет его в Android-клиент;
 - пропишет этот же IP в `App__DcOptions` сервера;
 - один раз заменит дефолтные пароли/ключи локальными случайными значениями;
+- при первом запуске создаст локальный `.env` из безопасного шаблона `.env.example`;
 - скачает pinned Docker images;
 - поднимет MongoDB, Redis, RabbitMQ, MinIO и MyTelegram;
 - откроет входящие MTProto TCP-порты в Windows Firewall.
